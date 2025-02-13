@@ -18,46 +18,55 @@ depois utilizo as funções existentes para preencher a aplicação.
 
 */
 
-void lerArquivo(){
-    FILE *input;
+void lerArquivo() {
+    FILE *input = fopen("estrutura.txt", "r");
+
+    if (input == NULL) {
+        // Se o arquivo não existir, cria um novo e encerra a função
+        input = fopen("estrutura.txt", "w");
+        if (input == NULL) {
+            printf("Erro ao criar o arquivo.\n");
+            return;
+        }
+        fclose(input);
+        printf("Arquivo criado com sucesso.\n");
+        return;
+    }
+
     char linha[1001];
-    int x,j=0;
-    char numero[1000];
-    int vetor[1000],tamanho,posicao;
+    while (fgets(linha, 1001, input) != NULL) {
+        int vetor[100]; // Vetor para armazenar os números lidos
+        char numero[100]; // Buffer para armazenar cada número como string
+        int j = 0; // Índice para o buffer 'numero'
+        int h = 0; // Índice para o vetor 'vetor'
+        int posicao = -1, tamanho = -1;
 
-    input = fopen("estrutura.txt","r");
-
-    if(input == NULL){
-        input = fopen("estrutura.txt","w");
-    } else if(input){
-        while(!feof(input)){
-            fgets(linha, 1001, input);
-            int h=0;
-            for(x=0; x<strlen(linha); x++){
-                if(linha[x]!= ';'){
-                    numero[j] = linha[x];
-                    j++;
-                } else if(linha[x] == ';'){
-                    numero[j] = '\0';
-                    vetor[h] = atoi(numero);
-                    h++;
-                    j=0;
-                }
+        for (int x = 0; x < strlen(linha); x++) {
+            if (linha[x] != ';') {
+                numero[j] = linha[x];
+                j++;
+            } else {
+                numero[j] = '\0'; // Finaliza a string
+                vetor[h] = atoi(numero); // Converte para inteiro
+                h++;
+                j = 0; // Reinicia o índice do buffer 'numero'
             }
-            for(x=0; x<h; x++){
-                if(x==0){
-                    posicao = vetor[x]+1;
-                }
-                else if(x==1){
-                    tamanho = vetor[x];
-                    criarEstruturaAuxiliar(tamanho,posicao);
-                }
-                else{
-                    inserirNumeroEmEstrutura(vetor[x],posicao);
-                }
+        }
+
+        // Processa os números lidos
+        for (int x = 0; x < h; x++) {
+            if (x == 0) {
+                posicao = vetor[x];
+            } else if (x == 1) {
+                tamanho = vetor[x];
+                criarEstruturaAuxiliar(posicao, tamanho);
+            } else {
+                inserirNumeroEmEstrutura(vetor[x], posicao);
             }
         }
     }
+
+    fclose(input);
 }
 
 
